@@ -1,2 +1,3 @@
 # Deployify
-Deployify, your go-to deployment solution inspired by Vercel. Effortlessly deploy React applications from your GitHub repository with automatic deployments and user-friendly interface. Boost your development workflow and showcase your projects with ease. Try Deployify today for efficient and hassle-free deployments! 
+- An Effortless React Deployments
+- Inspired by Vercel, Deployify streamlines React app deployment. Simply connect your GitHub repo for automatic deployments and a user-friendly experience. Deployify - Your shortcut to hassle-free React deployments! 🚀
