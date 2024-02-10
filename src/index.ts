@@ -1,16 +1,48 @@
 import express from "express";
 import cors from "cors";
+import { generateRandom } from "./utils/randomString";
+import simpleGit from "simple-git";
+import path from "path";
+import { getAllFilePath } from "./utils/file";
+import { uploadFileToStorage } from "./utils/storage";
 
 const app = express();
 
+app.use(express.json());
 app.use(cors());
 
-app.use("/deploy", (req, res) => {
+app.post("/deploy", async (req, res) => {
   const { repoUrl } = req.body;
-  res.json({
-    data: true,
-    error: null,
-  });
+  // Validate
+  const id = generateRandom();
+
+  try {
+    const projectDirPath = path.join(__dirname + `/project/${id}`);
+    await simpleGit().clone(repoUrl, projectDirPath);
+    const getAllFiles = getAllFilePath(projectDirPath);
+    // getAllFiles.forEach((file) => {
+    //   uploadFileToStorage(file.slice(__dirname.length + 1), file);
+    // });
+
+    return res.json({
+      data: {
+        status: "uploaded",
+        id,
+        getAllFiles,
+      },
+      error: null,
+    });
+  } catch (err) {
+    res.json({
+      data: {
+        status: "failed",
+      },
+      error: {
+        message: "invalid repo link",
+        err,
+      },
+    });
+  }
 });
 
 const port = process.env.PORT || 3000;
