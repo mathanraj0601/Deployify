@@ -5,6 +5,7 @@ import simpleGit from "simple-git";
 import path from "path";
 import { getAllFilePath } from "./utils/file";
 import { uploadFileToStorage } from "./utils/storage";
+import { addToQueue } from "./utils/queue";
 
 const app = express();
 
@@ -24,11 +25,11 @@ app.post("/deploy", async (req, res) => {
     //   uploadFileToStorage(file.slice(__dirname.length + 1), file);
     // });
 
+    await addToQueue(id, "uploaded");
     return res.json({
       data: {
         status: "uploaded",
         id,
-        getAllFiles,
       },
       error: null,
     });
@@ -39,7 +40,6 @@ app.post("/deploy", async (req, res) => {
       },
       error: {
         message: "invalid repo link",
-        err,
       },
     });
   }
