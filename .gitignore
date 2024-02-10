@@ -1,3 +1,9 @@
+# outputs
+
+**/project/**
+**/dist/project/**
+
+
 # Logs
 logs
 *.log
