@@ -54,38 +54,3 @@ export async function uploadFileToStorage(
     throw error;
   }
 }
-
-// export async function downloadFromStorage(dirName: string) {
-//   const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
-//   const containerExists = await containerClient.exists();
-//   if (!containerExists) {
-//     console.error("Container not found");
-//     return;
-//   }
-//   const blobIterator = containerClient.listBlobsFlat({ prefix: dirName });
-//   // console.log(blobIterator);
-//   for await (const blob of blobIterator) {
-//     const blockBlobClient = containerClient.getBlockBlobClient(blob.name);
-//     const filePath = path.join(__dirname, "..", "blob", blob.name);
-
-//     await fsPromises.mkdir(dirname(filePath), { recursive: true });
-
-//     console.log(filePath, "file path to local");
-//     try {
-//       const response = await blockBlobClient.download();
-//       const writeStream = createWriteStream(filePath);
-//       await new Promise<void>((resolve, reject) => {
-//         response
-//           .readableStreamBody!.pipe(writeStream)
-//           .on("finish", resolve)
-//           .on("error", reject);
-//       });
-//       console.log(
-//         `File '${blob.name}' downloaded successfully to '${filePath}'.`
-//       );
-//     } catch (error: any) {
-//       console.error(`Error downloading file '${blob.name}': ${error.message}`);
-//     }
-//     console.log(blockBlobClient);
-//   }
-// }

@@ -20,12 +20,14 @@ app.post("/deploy", async (req, res) => {
   try {
     const projectDirPath = path.join(__dirname + `/project/${id}`);
     await simpleGit().clone(repoUrl, projectDirPath);
-    // const getAllFiles = getAllFilePath(projectDirPath);
-    // getAllFiles.forEach((file) => {
-    //   uploadFileToStorage(file.slice(__dirname.length + 1), file);
-    // });
+    const getAllFiles = getAllFilePath(projectDirPath);
+    const uploadPromises = getAllFiles.map(async (file) => {
+      await uploadFileToStorage(file.slice(__dirname.length + 1), file);
+    });
 
-    https: await addToQueue(id, "uploaded");
+    await Promise.all(uploadPromises);
+
+    await addToQueue(id, "uploaded");
     return res.json({
       data: {
         status: "uploaded",
