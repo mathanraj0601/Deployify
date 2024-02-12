@@ -1,5 +1,8 @@
 import redis, { commandOptions, createClient } from "redis";
-import { downloadFromStorage } from "./utils/storage";
+import { downloadFromStorage, uploadFileToStorage } from "./utils/storage";
+import path from "path";
+import { buildProject } from "./utils/builder";
+import { getAllFilePath } from "./utils/file";
 
 const subscribe = createClient();
 subscribe.connect();
@@ -12,8 +15,19 @@ async function main() {
       QUEUE_NAME,
       0
     );
-    await downloadFromStorage(FOLDER_NAME + "/" + res?.element);
-    console.log(res);
+    const filepath = FOLDER_NAME + "/" + res?.element;
+    await downloadFromStorage(filepath);
+
+    const dirPath = path.join(__dirname + `/project/${res?.element}`);
+    await buildProject(dirPath);
+    const getAllFiles = getAllFilePath(dirPath + "/dist");
+    const uploadPromises = getAllFiles.map(async (file) => {
+      await uploadFileToStorage(
+        "project-build/" + file.slice((__dirname + "/project").length + 1),
+        file
+      );
+    });
+    await Promise.all(uploadPromises);
   }
 }
 

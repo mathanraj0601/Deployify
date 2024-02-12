@@ -1,5 +1,5 @@
 import { BlobServiceClient } from "@azure/storage-blob";
-import { createWriteStream, promises as fsPromises } from "fs";
+import { createWriteStream, promises as fsPromises, readFileSync } from "fs";
 import path, { dirname } from "path";
 
 const connStr = process.env.BLOB_CONN_STR ?? "";
@@ -17,8 +17,7 @@ export async function downloadFromStorage(dirName: string) {
   }
   const blobIterator = containerClient.listBlobsFlat({ prefix: dirName });
   for await (const blob of blobIterator) {
-    const blockBlobClient = containerClient.getBlockBlobClient(blob.name);
-    const filePath = path.join(__dirname, "..", "blob", blob.name);
+    const filePath = path.join(__dirname, "..", blob.name);
 
     await fsPromises.mkdir(dirname(filePath), { recursive: true });
 
@@ -37,5 +36,27 @@ export async function downloadFromStorage(dirName: string) {
     } catch (error: any) {
       console.log(`Error downloading file '${blob.name}': ${error.message}`);
     }
+  }
+}
+
+export async function uploadFileToStorage(
+  fileName: string,
+  localFilePath: string
+) {
+  const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
+  const containerExists = await containerClient.exists();
+  if (!containerExists) {
+    await containerClient.create();
+    console.info(`Container '${CONTAINER_NAME}' created.`);
+  }
+  const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+  const fileContent = readFileSync(localFilePath);
+  try {
+    // Upload the file
+    await blockBlobClient.upload(fileContent, fileContent.length);
+    console.info(`File '${fileName}' uploaded successfully.`);
+  } catch (error: any) {
+    console.error(`Error uploading file '${fileName}': ${error.message}`);
+    throw error;
   }
 }
