@@ -1,0 +1,82 @@
+.App {
+  width: 100%;
+  max-height: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: large;
+}
+.app-container {
+  width: 20%;
+  min-width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.input-header {
+  text-align: center;
+  line-height: 1.5rem;
+}
+
+.input-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.input-box > input {
+  padding: 0.5rem;
+}
+
+.input-btn > button {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: medium;
+  background-color: darkolivegreen;
+  color: white;
+  border: none;
+}
+
+.input-btn > button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+.link-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.link-box > a {
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+  background-color: black;
+  padding: 0.5rem 0rem;
+}
+
+.link {
+  text-align: center;
+  font-size: large;
+  padding: 0.5rem;
+  border: 1px solid black;
+}
+
+.reset-btn {
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  color: black;
+  padding: 0.5rem;
+  border: 1px solid black;
+  background-color: white;
+  font-size: small;
+  cursor: pointer;
+}
