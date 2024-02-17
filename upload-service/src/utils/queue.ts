@@ -10,3 +10,19 @@ export async function addToQueue(id: string, status: string) {
     console.log(err);
   }
 }
+
+export async function getStatus(id: any) {
+  try {
+    return await publisher.get(id);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export async function addStaus(id: any) {
+  try {
+    await publisher.set(id, "uploaded");
+  } catch (err) {
+    console.log(err);
+  }
+}

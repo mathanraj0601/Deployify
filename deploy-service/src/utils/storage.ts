@@ -19,6 +19,7 @@ export async function downloadFromStorage(dirName: string) {
   for await (const blob of blobIterator) {
     const filePath = path.join(__dirname, "..", blob.name);
 
+    const blockBlobClient = containerClient.getBlockBlobClient(blob.name);
     await fsPromises.mkdir(dirname(filePath), { recursive: true });
 
     try {
