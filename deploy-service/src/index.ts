@@ -3,6 +3,7 @@ import { downloadFromStorage, uploadFileToStorage } from "./utils/storage";
 import path from "path";
 import { buildProject } from "./utils/builder";
 import { getAllFilePath } from "./utils/file";
+import { updateStatus } from "./utils/redis";
 
 const subscribe = createClient();
 subscribe.connect();
@@ -28,6 +29,7 @@ async function main() {
       );
     });
     await Promise.all(uploadPromises);
+    if (res?.element) await updateStatus(res?.element);
   }
 }
 

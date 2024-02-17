@@ -3,9 +3,10 @@ import { useState } from "react";
 import { deployProject, getStatus } from "./services/deploy.service";
 
 function App() {
-  const [deployStatus, setDeployStatus] = useState("deployed");
+  const [deployStatus, setDeployStatus] = useState("");
   const [id, setId] = useState("");
   const [loading, setLoading] = useState("");
+  const [githubUrl, setGithubURl] = useState("");
 
   const handleReset = () => {
     setId("");
@@ -13,12 +14,13 @@ function App() {
   };
   const handleSubmit = async () => {
     try {
-      const res = await deployProject();
-      console.log("cathced");
-      setId(res.data.id);
-      setDeployStatus(res.data.status);
+      const res = await deployProject(githubUrl);
+      console.log("called deploy project" + githubUrl);
+      setId(res.data.data.id);
+      setDeployStatus(res.data.data.status);
       setLoading(true);
-      await getDeployStatus(id);
+      console.log(res);
+      await getDeployStatus(res.data.data.id);
     } catch (err) {
       alert("Backend not working");
     }
@@ -27,11 +29,15 @@ function App() {
   const getDeployStatus = async (id) => {
     const intervalId = setInterval(async () => {
       try {
+        console.log("getting deploy status");
+
         const res = await getStatus(id);
-        setDeployStatus(res.data.status);
-        setLoading(false);
-        if (res.data.status === "deployed") {
-          await clearInterval(intervalId);
+
+        console.log(res);
+        if (res.data.data.status === "deployed") {
+          setLoading(false);
+          setDeployStatus("deployed");
+          clearInterval(intervalId);
         }
       } catch (err) {
         console.log(err);
@@ -56,6 +62,7 @@ function App() {
               <input
                 type="text"
                 placeholder="https://github.com/your-username/your-repository.git"
+                onChange={(e) => setGithubURl(e.target.value)}
               />
             </>
           )}

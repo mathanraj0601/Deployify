@@ -5,13 +5,17 @@ import ax from "axios";
 // });
 
 const axios = ax.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: "http://localhost:3000",
 });
 
-export const deployProject = () => {
-  return axios.post("/deploy");
+export const deployProject = (gitHUbURl) => {
+  return axios.post("/deploy", {
+    repoUrl: gitHUbURl,
+  });
 };
 
-export const getStatus = (id) => {
-  return axios.get(`/status?id=${id}`);
-};
+export async function getStatus(id) {
+  const res = await axios.get(`/status?id=${id}`);
+  console.log(res);
+  return res;
+}

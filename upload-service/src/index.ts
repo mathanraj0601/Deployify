@@ -5,7 +5,7 @@ import simpleGit from "simple-git";
 import path from "path";
 import { getAllFilePath } from "./utils/file";
 import { uploadFileToStorage } from "./utils/storage";
-import { addToQueue } from "./utils/queue";
+import { addStaus, addToQueue, getStatus } from "./utils/queue";
 
 const app = express();
 
@@ -28,6 +28,7 @@ app.post("/deploy", async (req, res) => {
     await Promise.all(uploadPromises);
 
     await addToQueue(id, "uploaded");
+    await addStaus(id);
     return res.json({
       data: {
         status: "uploaded",
@@ -37,6 +38,30 @@ app.post("/deploy", async (req, res) => {
     });
   } catch (err) {
     res.json({
+      data: {
+        status: "failed",
+      },
+      error: {
+        message: "invalid repo link",
+      },
+    });
+  }
+});
+
+app.get("/status", async (req, res) => {
+  const id = req.query.id;
+  if (!id) return res.status(500);
+  try {
+    const status = await getStatus(id);
+    console.log(status);
+    return res.status(200).json({
+      data: {
+        status: status,
+      },
+      error: {},
+    });
+  } catch (err) {
+    return res.status(400).json({
       data: {
         status: "failed",
       },

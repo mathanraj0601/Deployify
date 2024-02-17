@@ -9,7 +9,8 @@ app.use(cors());
 
 app.get("/*", async (req, res) => {
   const id = req.hostname.split(".")[0];
-  const filePath = req.path;
+  const filePath = req.path !== "/" ? req.path : "/index.html";
+  console.log(filePath);
   const type = getContentType(filePath);
 
   console.log("project-build/" + id + "/dist" + filePath);
