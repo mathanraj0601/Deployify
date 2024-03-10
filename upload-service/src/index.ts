@@ -20,8 +20,8 @@ app.post("/deploy", async (req, res) => {
     Env: [
       `GITHUB_LINK=${repoUrl}`,
       `PROJECT_ID=${id}`,
-      "BLOB_CONN_STR=DefaultEndpointsProtocol=https;AccountName=deployify;AccountKey=smIC3T6Dy4m3OIozNpys2wfHk3Wyl+iqGXLLgml2Xbiv4ryrwUTIkGh3FkpQ3eHykOkpVZA+qQLz+AStzFwgyA==;EndpointSuffix=core.windows.net",
-      "FRAMEWORK=REACT",
+      "BLOB_CONN_STR=<connection-string>",
+      "FRAMEWORK=ANGULAR",
     ],
   };
 
