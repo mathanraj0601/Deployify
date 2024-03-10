@@ -1,40 +1,28 @@
 import express from "express";
 import cors from "cors";
-import { downloadBlobAsBuffer } from "./utils/storage";
-
+import httpProxy from "http-proxy";
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 
-app.get("/*", async (req, res) => {
-  const id = req.hostname.split(".")[0];
-  const filePath = req.path !== "/" ? req.path : "/index.html";
-  console.log(filePath);
-  const type = getContentType(filePath);
+const proxy = httpProxy.createProxy();
+const port = 3001;
+const BASE_URL = "https://deployify.blob.core.windows.net/deployify";
 
-  console.log("project-build/" + id + "/dist" + filePath);
-  const file = await downloadBlobAsBuffer(
-    "project-build/" + id + "/dist" + filePath
-  );
-  res.set("Content-Type", type);
-
-  res.send(file);
+app.use((req, res) => {
+  const subDomain = req.hostname.split(".")[0];
+  const targetUrl = `${BASE_URL}/${subDomain}`;
+  console.log(subDomain, targetUrl);
+  return proxy.web(req, res, { target: targetUrl, changeOrigin: true });
 });
 
-function getContentType(filePath: string) {
-  if (filePath.endsWith(".html")) {
-    return "text/html";
-  } else if (filePath.endsWith(".css")) {
-    return "text/css";
-  } else if (filePath.endsWith(".js")) {
-    return "application/javascript";
-  } else {
-    return "text/plain";
+proxy.on("proxyReq", (proxyReq, req, res) => {
+  const url = req.url;
+  if (url === "/") {
+    proxyReq.path += "index.html";
   }
-}
+});
 
-const port = 3001;
 app.listen(port, () => {
   console.info(`Server is listening on port :${port}`);
 });

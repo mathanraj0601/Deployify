@@ -1,34 +1,43 @@
 import express from "express";
 import cors from "cors";
 import { generateRandom } from "./utils/randomString";
-import simpleGit from "simple-git";
-import path from "path";
-import { getAllFilePath } from "./utils/file";
-import { uploadFileToStorage } from "./utils/storage";
-import { addStaus, addToQueue, getStatus } from "./utils/queue";
+import Docker from "dockerode";
+const docker = new Docker();
 
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 
 app.post("/deploy", async (req, res) => {
-  const { repoUrl } = req.body;
-  // Validate
-  const id = generateRandom();
+  const { repoUrl, projectId } = req.body;
+  const id = projectId ?? generateRandom();
+  const containerName = id;
+  const imageName = "mathanraj0601/deployify:1.0.0";
+
+  const createOptions = {
+    Image: imageName,
+    name: containerName,
+    Env: [
+      `GITHUB_LINK=${repoUrl}`,
+      `PROJECT_ID=${id}`,
+      "BLOB_CONN_STR=DefaultEndpointsProtocol=https;AccountName=deployify;AccountKey=smIC3T6Dy4m3OIozNpys2wfHk3Wyl+iqGXLLgml2Xbiv4ryrwUTIkGh3FkpQ3eHykOkpVZA+qQLz+AStzFwgyA==;EndpointSuffix=core.windows.net",
+      "FRAMEWORK=REACT",
+    ],
+  };
 
   try {
-    const projectDirPath = path.join(__dirname + `/project/${id}`);
-    await simpleGit().clone(repoUrl, projectDirPath);
-    const getAllFiles = getAllFilePath(projectDirPath);
-    const uploadPromises = getAllFiles.map(async (file) => {
-      await uploadFileToStorage(file.slice(__dirname.length + 1), file);
+    docker.createContainer(createOptions, (err, container) => {
+      if (err) {
+        console.log(err, "error");
+        return;
+      }
+
+      container?.start((err, data) => {
+        console.log(err + "error");
+        console.log(data + "data");
+      });
     });
 
-    await Promise.all(uploadPromises);
-
-    await addToQueue(id, "uploaded");
-    await addStaus(id);
     return res.json({
       data: {
         status: "uploaded",
@@ -38,30 +47,6 @@ app.post("/deploy", async (req, res) => {
     });
   } catch (err) {
     res.json({
-      data: {
-        status: "failed",
-      },
-      error: {
-        message: "invalid repo link",
-      },
-    });
-  }
-});
-
-app.get("/status", async (req, res) => {
-  const id = req.query.id;
-  if (!id) return res.status(500);
-  try {
-    const status = await getStatus(id);
-    console.log(status);
-    return res.status(200).json({
-      data: {
-        status: status,
-      },
-      error: {},
-    });
-  } catch (err) {
-    return res.status(400).json({
       data: {
         status: "failed",
       },

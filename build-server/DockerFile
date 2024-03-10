@@ -1,0 +1,23 @@
+
+# Base image
+FROM ubuntu:focal
+
+# Installing nodejs and git
+RUN apt-get update
+RUN apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get upgrade -y
+RUN apt-get install -y nodejs
+RUN apt-get install -y git
+
+# Moving to app dir
+WORKDIR /home/app/
+
+# Copying main.sh
+COPY . .
+RUN npm install
+
+# Set the executable permission for main.sh
+RUN chmod +x main.sh
+
+ENTRYPOINT [ "/home/app/main.sh" ]
